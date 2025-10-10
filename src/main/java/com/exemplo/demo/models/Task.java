@@ -4,14 +4,14 @@ import java.util.Objects;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,10 +22,10 @@ import lombok.Setter;
 @Table(name = Task.TABLE_NAME)
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class Task {
-    
+
     public static final String TABLE_NAME = "task";
 
     @Id
@@ -33,34 +33,29 @@ public class Task {
     @Column(name = "id", unique = true)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false, updatable = false)
     private User user;
 
     @Column(name = "description", length = 255, nullable = false)
-    @NotNull
-    @NotEmpty
-    @Size(min = 1, max = 255)
+    @NotBlank(message = "A descrição da tarefa é obrigatória")
+    @Size(max = 255, message = "A descrição deve ter no máximo 255 caracteres")
     private String description;
 
-     @Override
-    public boolean equals(Object object) {
-        if(object == this) {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if(!(object instanceof Task)) {
+        if (!(o instanceof Task)) {
             return false;
         }
-        Task task = (Task) object;
-        return Objects.equals(id, task.id) && Objects.equals(user, task.user) 
-        && Objects.equals(description, task.description);
+        Task task = (Task) o;
+        return Objects.equals(id, task.id);
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((this.id == null) ? 0 : this.id.hashCode());
-        return result;
+        return Objects.hash(id);
     }
 }

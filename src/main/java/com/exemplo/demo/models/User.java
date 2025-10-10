@@ -1,12 +1,15 @@
 package com.exemplo.demo.models;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,10 +31,13 @@ import lombok.Setter;
 @NoArgsConstructor
 public class User {
 
-    public interface CreateUser {}
-    public interface UpdateUser {}
+    public interface CreateUser {
+    }
 
-    public static final String TABLE_NAME = "user";
+    public interface UpdateUser {
+    }
+
+    public static final String TABLE_NAME = "`user`";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,29 +49,28 @@ public class User {
     @NotEmpty(groups = CreateUser.class)
     @Size(groups = CreateUser.class, min = 2, max = 100)
     private String username;
-    
+
     @Column(name = "password", length = 60, nullable = false)
     @NotNull(groups = {CreateUser.class, UpdateUser.class})
     @NotEmpty(groups = {CreateUser.class, UpdateUser.class})
     @Size(groups = {CreateUser.class, UpdateUser.class}, min = 8, max = 60)
     private String password;
 
-
-    @OneToMany(mappedBy = "user") // mapeado pela variável -> user
-    private List<Task> tasks = new ArrayList<Task>();
-
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Task> tasks = new ArrayList<>(); // ← Inicializar a lista
 
     @Override
     public boolean equals(Object object) {
-        if(object == this) {
+        if (object == this) {
             return true;
         }
-        if(!(object instanceof User)) {
+        if (!(object instanceof User)) {
             return false;
         }
         User user = (User) object;
-        return Objects.equals(id, user.id) && Objects.equals(username, user.username) 
-        && Objects.equals(password, user.password);
+        return Objects.equals(id, user.id) && Objects.equals(username, user.username)
+                && Objects.equals(password, user.password);
     }
 
     @Override
