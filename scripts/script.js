@@ -38,9 +38,9 @@ async function getTasks() {
     show(data);
 }
 
-document.addEventListener("DOMContentLoaded", function (event) {
-  if (!localStorage.getItem("Authorization"))
-    window.location = "/view/login.html";
-});
+// document.addEventListener("DOMContentLoaded", function (event) {
+//   if (!localStorage.getItem("Authorization"))
+//     window.location = "./view/login.html";
+// });
 
 getTasks();
