@@ -1,15 +1,21 @@
 package com.exemplo.demo.models;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.exemplo.demo.models.enums.ProfileEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -83,5 +89,19 @@ public class User {
         int result = 1;
         result = prime * result + ((this.id == null) ? 0 : this.id.hashCode());
         return result;
+    }
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @JsonProperty(access = Access.WRITE_ONLY)
+    @CollectionTable(name = "user_profile")
+    @Column(name = "profile", nullable = false)
+    private Set<Integer> profiles = new HashSet<>();
+
+    public Set<ProfileEnum> getProfiles() {
+        return this.profiles.stream().map(x -> ProfileEnum.toEnum(x)).collect(Collectors.toSet());
+    }
+
+    public void addProfile(ProfileEnum profileEnum) {
+        this.profiles.add(profileEnum.getCode());
     }
 }
